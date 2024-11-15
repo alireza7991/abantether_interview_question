@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  aban_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash entrypoint.sh
+    volumes:
+      - .:/code
+    ports:
+      - "8000:80"
+    environment:
+      - DEBUG=false
+      - DJANGO_DB_HOST=aban_db
+      - DJANGO_DB_NAME=postgres
+      - DJANGO_DB_USER=postgres
+      - DJANGO_DB_PASSWORD=postgres
+      - DEFAULT_EXCHANGE_SERVICE=binance
+    depends_on:
+      - aban_db
+      - aban_redis
+
+  aban_redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  aban_db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
